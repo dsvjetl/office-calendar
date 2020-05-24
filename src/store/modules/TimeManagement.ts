@@ -10,9 +10,6 @@ const getters = {
 };
 
 const mutations = {
-  setStartingDay(state: TimeManagementState, startingDay: any) {
-    state.startingDay = startingDay;
-  },
   incrementWeek() {
     const currentStartingDate = state.startingDay;
     const incrementedStartingDate = moment(currentStartingDate).add(7, 'days').endOf('day');
