@@ -7,13 +7,12 @@
     <td class="timeLabel">
       {{timePeriod[0] | timeFormatFilter}}:{{timePeriod[1] | timeFormatFilter}}
     </td>
-    <td class="timeSlot"></td>
-    <td class="timeSlot"></td>
-    <td class="timeSlot"></td>
-    <td class="timeSlot"></td>
-    <td class="timeSlot"></td>
-    <td class="timeSlot"></td>
-    <td class="timeSlot"></td>
+    <TimeSlot
+      v-for="n in 7"
+      :key="n"
+      :timePeriodProp="timePeriod"
+      :dayProp="n"
+    />
   </tr>
   </tbody>
 </template>
@@ -22,14 +21,16 @@
   import Vue from 'vue';
   import { Component } from 'vue-property-decorator';
   import { timeFormatFilter } from '@/utils/filters/timeFormatFilter';
+  import TimeSlot from '@/components/elements/TimeSlot.vue';
 
   @Component({
+    components: { TimeSlot },
     filters: {
       timeFormatFilter,
     },
   })
   export default class CalendarBody extends Vue {
-    public get timePeriods() {
+    public get timePeriods(): number[][] {
       const loopLength = Array.from(Array(48).keys());
       const hours: number[] = loopLength.filter((loop) => (!(loop % 2)))
         .map((loop) => (loop / 2));
@@ -41,20 +42,10 @@
 
 <style lang="scss" scoped>
   .coCalendarBody {
-    .timeSlot, .timeLabel {
+    .timeLabel {
       padding: 5px 10px;
       text-align: center;
       border-radius: 3px;
-    }
-
-    .timeSlot {
-      background-color: $primary-bg;
-      transition: background-color .3s ease-in-out;
-
-      &:hover {
-        cursor: pointer;
-        background-color: lighten($primary-bg, 10);
-      }
     }
 
     .timeLabel {

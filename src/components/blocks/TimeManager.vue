@@ -1,7 +1,9 @@
 <template>
   <div class="coTimeManager">
     <div>
-      <Button>
+      <Button
+        @click.native="changeCurrentWeek('DECREMENT')"
+      >
         <ArrowLeftIcon/>
       </Button>
     </div>
@@ -9,7 +11,9 @@
       <p class="u3">{{weekRange}}</p>
     </div>
     <div>
-      <Button>
+      <Button
+        @click.native="changeCurrentWeek('INCREMENT')"
+      >
         <ArrowRightIcon/>
       </Button>
     </div>
@@ -18,7 +22,7 @@
 
 <script lang="ts">
   import Vue from 'vue';
-  import { Component } from 'vue-property-decorator';
+  import { Component, Watch } from 'vue-property-decorator';
   import ArrowLeftIcon from '@/components/icons/ArrowLeftIcon.vue';
   import ArrowRightIcon from '@/components/icons/ArrowRightIcon.vue';
   import Button from '@/components/elements/Button.vue';
@@ -28,13 +32,32 @@
     components: { Button, ArrowRightIcon, ArrowLeftIcon },
   })
   export default class TimeManager extends Vue {
-    public now = moment();
-    private monday = this.now.clone().weekday(1);
-    private sunday = this.now.clone().weekday(7);
+    public get startingDay(): any {
+      return this.$store.getters.startingDay;
+    }
+
+    public get weekStart() {
+      return this.startingDay.add(1, 'days').clone().weekday(1);
+    }
+
+    public get weekEnd() {
+      return this.startingDay.add(1, 'days').clone().weekday(7);
+    }
 
     public get weekRange(): string {
       const formatMoment = (date: any): string => date.format('DD.MM.YYYY');
-      return `${formatMoment(this.monday)} - ${formatMoment(this.sunday)}`;
+      return `${formatMoment(this.weekStart)} - ${formatMoment(this.weekEnd)}`;
+    }
+
+    public changeCurrentWeek(type: string) {
+      switch (type) {
+        case 'INCREMENT':
+          this.$store.commit('incrementWeek');
+          break;
+        case 'DECREMENT':
+          this.$store.commit('decrementWeek');
+          break;
+      }
     }
   }
 </script>
