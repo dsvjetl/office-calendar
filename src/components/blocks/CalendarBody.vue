@@ -49,7 +49,7 @@
     }
 
     .timeLabel {
-      background-color: $purple-light;
+      background-color: $purple;
     }
   }
 </style>

@@ -2,7 +2,7 @@
   <td
     class="coTimeSlot"
     @click="handleClick"
-    :class="[{'isPast': isTimePast}]"
+    :class="[{'isPast': isTimePast || isNotWorkingHoursSlot}]"
   >
   </td>
 </template>
@@ -17,7 +17,14 @@
     @Prop({ required: true }) public timePeriodProp!: number[];
     @Prop({ required: true }) public dayProp!: number;
     private clickedDay: any = moment();
-    private now: any = moment();
+    private evenDay: { startHour: number, endHour: number } = {
+      startHour: 8,
+      endHour: 14,
+    };
+    private oddDay: { startHour: number, endHour: number } = {
+      startHour: 13,
+      endHour: 19,
+    };
 
     public handleClick() {
       this.clickedDay = this.startingDay.day(this.dayProp);
@@ -40,15 +47,45 @@
       return moment(startingISO).day(this.dayProp);
     }
 
-    public get isTimePast(): any {
+    public get isTimePast(): boolean {
       return this.currentDay.endOf('day').isBefore(moment().add(1, 'days').endOf('day'));
+    }
+
+    private get isDayEven(): boolean {
+      return this.currentDay.isoWeekday() % 2 === 0;
+    }
+
+    public get isNotWorkingHoursSlot(): boolean {
+      if (this.isTimePast) {
+        return false;
+      }
+
+      const slotHour: number = this.timePeriodProp[0];
+      const slotMinute: number = this.timePeriodProp[1];
+
+      const evenDaysNotWorkingSlots = (slotHour < this.evenDay.startHour)
+        || (slotHour > this.evenDay.endHour)
+        || (slotHour === this.evenDay.endHour && slotMinute === 30);
+      const oddDaysNotWorkingSlots = (slotHour < this.oddDay.startHour)
+        || (slotHour > this.oddDay.endHour)
+        || (slotHour === this.oddDay.endHour && slotMinute === 30);
+
+      if (this.isDayEven) {
+        return evenDaysNotWorkingSlots;
+      }
+
+      if (!this.isDayEven) {
+        return oddDaysNotWorkingSlots;
+      }
+
+      return true;
     }
   }
 </script>
 
 <style lang="scss" scoped>
   .coTimeSlot {
-    background-color: $primary-bg;
+    background-color: $available;
     transition: all .3s ease-in-out;
     padding: 5px 10px;
     text-align: center;
@@ -56,7 +93,7 @@
 
     &:hover {
       cursor: pointer;
-      background-color: lighten($primary-bg, 10);
+      background-color: lighten($available, 10);
       transform: scale(1.05);
     }
 

@@ -2,7 +2,7 @@
   <thead class="coCalendarHead">
   <tr>
     <th class="headLabel">
-      <ClockIcon/>
+      <ClockIcon class="clockIcon"/>
     </th>
     <th
       class="u-2 headLabel"
@@ -43,6 +43,11 @@
       border-radius: 3px;
       padding: 5px 10px;
       width: 40px;
+    }
+
+    .clockIcon {
+      position: relative;
+      top: 2px;
     }
   }
 </style>
