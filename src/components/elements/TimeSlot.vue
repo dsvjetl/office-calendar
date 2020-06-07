@@ -2,7 +2,7 @@
   <td
     class="coTimeSlot"
     @click="handleClick"
-    :class="[{'isPast': isTimePast || isNotWorkingHoursSlot}]"
+    :class="[{'isPast': isNotWorking}]"
   >
   </td>
 </template>
@@ -17,13 +17,31 @@
     @Prop({ required: true }) public timePeriodProp!: number[];
     @Prop({ required: true }) public dayProp!: number;
     private clickedDay: any = moment();
-    private evenDay: { startHour: number, endHour: number } = {
+    private evenDay: {
+      startHour: number,
+      endHour: number,
+      breakStart: {
+        hour: number,
+      },
+    } = {
       startHour: 8,
       endHour: 14,
+      breakStart: {
+        hour: 11,
+      },
     };
-    private oddDay: { startHour: number, endHour: number } = {
+    private oddDay: {
+      startHour: number,
+      endHour: number,
+      breakStart: {
+        hour: number,
+      },
+    } = {
       startHour: 13,
       endHour: 19,
+      breakStart: {
+        hour: 16,
+      },
     };
 
     public handleClick() {
@@ -38,16 +56,23 @@
       alert(message);
     }
 
+    public get isNotWorking() {
+      return this.isTimePast
+        || this.isNotWorkingTime
+        || this.isEvenDayBreak
+        || this.isOddDayBreak;
+    }
+
     private get startingDay(): any {
       return this.$store.getters.startingDay;
     }
 
-    public get currentDay(): any {
+    private get currentDay(): any {
       const startingISO = this.startingDay.toISOString();
       return moment(startingISO).day(this.dayProp);
     }
 
-    public get isTimePast(): boolean {
+    private get isTimePast(): boolean {
       return this.currentDay.endOf('day').isBefore(moment().add(1, 'days').endOf('day'));
     }
 
@@ -55,7 +80,27 @@
       return this.currentDay.isoWeekday() % 2 === 0;
     }
 
-    public get isNotWorkingHoursSlot(): boolean {
+    private get isEvenDayBreak(): boolean {
+      if (!this.isDayEven) {
+        return false;
+      }
+
+      const slotHour: number = this.timePeriodProp[0];
+
+      return slotHour === this.evenDay.breakStart.hour;
+    }
+
+    private get isOddDayBreak(): boolean {
+      if (this.isDayEven) {
+        return false;
+      }
+
+      const slotHour: number = this.timePeriodProp[0];
+
+      return slotHour === this.oddDay.breakStart.hour;
+    }
+
+    private get isNotWorkingTime(): boolean {
       if (this.isTimePast) {
         return false;
       }
