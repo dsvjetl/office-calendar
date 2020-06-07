@@ -1,10 +1,11 @@
 <template>
   <td
     class="coTimeSlot"
-    @click="handleClick"
+    @click="handleClick()"
     :class="[
       {'isPast': isNotWorking},
-      {'isBreak': (isEvenDayBreak || isOddDayBreak)}
+      {'isBreak': (isEvenDayBreak || isOddDayBreak)},
+      {'isReserved': isReserved}
     ]"
   >
   </td>
@@ -14,12 +15,12 @@
   import Vue from 'vue';
   import { Component, Prop } from 'vue-property-decorator';
   import moment from 'moment';
+  import { Reservations } from '@/types/Reservations';
 
   @Component
   export default class TimeSlot extends Vue {
     @Prop({ required: true }) public timePeriodProp!: number[];
     @Prop({ required: true }) public dayProp!: number;
-    private clickedDay: any = moment();
     private evenDay: {
       startHour: number,
       endHour: number,
@@ -47,18 +48,6 @@
       },
     };
 
-    public handleClick() {
-      this.clickedDay = this.startingDay.day(this.dayProp);
-
-      const message = `
-        You want reservation on ${this.timePeriodProp[0]}h:${this.timePeriodProp[1]}m
-        on ${this.clickedDay.format('DD.MM.YYYY')}?
-      `;
-
-      // TODO @dsvjetl - remove
-      alert(message);
-    }
-
     public get isNotWorking(): boolean {
       return this.isTimePast
         || this.isNotWorkingTime
@@ -66,6 +55,10 @@
         || this.isOddDayBreak
         || this.isSunday
         || this.isNotWorkingSaturday;
+    }
+
+    private get reservations(): Reservations[] {
+      return this.$store.getters.reservations;
     }
 
     private get startingDay(): any {
@@ -121,6 +114,16 @@
       return !this.isDayEven && this.dayProp === 6;
     }
 
+    private get isReserved(): boolean {
+      const currentDay = this.currentDay;
+      const reserved = this.reservations.filter((reservation) => (
+        reservation.hour === this.timePeriodProp[0]
+        && reservation.minute === this.timePeriodProp[1]
+        && currentDay.isSame(reservation.day, 'day')
+      ));
+      return reserved.length > 0;
+    }
+
     private get isNotWorkingTime(): boolean {
       if (this.isTimePast) {
         return false;
@@ -145,6 +148,25 @@
       }
 
       return true;
+    }
+
+    public handleClick() {
+      const day = this.startingDay.day(this.dayProp);
+      const message = `
+        You want this reservation?
+        Time: ${this.timePeriodProp[0]}h:${this.timePeriodProp[1]}m
+        /
+        Duration: 30min
+        /
+        Day: ${day.format('DD.MM.YYYY')}
+      `;
+
+      this.$emit('onReservationClicked', {
+        message,
+        day,
+        hour: this.timePeriodProp[0],
+        minute: this.timePeriodProp[1],
+      });
     }
   }
 </script>
@@ -171,6 +193,11 @@
     &.isBreak {
       pointer-events: none;
       background-color: $break;
+    }
+
+    &.isReserved {
+      pointer-events: none;
+      background-color: $reserved;
     }
   }
 </style>

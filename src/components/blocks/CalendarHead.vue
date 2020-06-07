@@ -5,7 +5,7 @@
       <ClockIcon class="clockIcon"/>
     </th>
     <th
-      class="u-2 headLabel"
+      class="u2 headLabel"
       v-for="weekDay in weekDays"
       :key="weekDay.value"
     >

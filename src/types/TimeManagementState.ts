@@ -1,4 +1,6 @@
+import { Reservations } from '@/types/Reservations';
+
 export interface TimeManagementState {
   startingDay: any;
-  today: any;
+  reservations: Reservations[];
 }

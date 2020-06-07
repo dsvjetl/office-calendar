@@ -14,7 +14,11 @@
   import TimeManager from '@/components/blocks/TimeManager.vue';
 
   @Component({
-    components: { TimeManager, Header, CalendarWrapper },
+    components: {
+      TimeManager,
+      Header,
+      CalendarWrapper,
+    },
   })
   export default class Home extends Vue {
 
