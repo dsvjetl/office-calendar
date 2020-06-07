@@ -32,7 +32,7 @@
   import { timeFormatFilter } from '@/utils/filters/timeFormatFilter';
   import TimeSlot from '@/components/elements/TimeSlot.vue';
   import Modal from '@/components/blocks/Modal.vue';
-  import { Reservations } from '@/types/Reservations';
+  import { Reservation } from '@/types/Reservations';
   import moment from 'moment';
 
   @Component({
@@ -47,7 +47,7 @@
       show: false,
       type: 'normal',
     };
-    private reservation: Reservations = {
+    private reservation: Reservation = {
       day: null,
       hour: 0,
       minute: 0,
@@ -70,7 +70,7 @@
       return hours.map((hour) => [[hour, 0], [hour, 30]]).flat();
     }
 
-    public onReservationClicked(reservation: Reservations) {
+    public onReservationClicked(reservation: Reservation) {
       this.modal.message = reservation.message;
       this.modal.type = 'normal';
       const reservationISO = reservation.day.toISOString();
