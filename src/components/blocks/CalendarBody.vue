@@ -12,8 +12,17 @@
       :key="n"
       :timePeriodProp="timePeriod"
       :dayProp="n"
+      @onReservationClicked="onReservationClicked($event)"
+      @onValidationError="onValidationError($event)"
     />
   </tr>
+  <Modal
+    v-if="modal.show"
+    :message="modal.message"
+    :type="modal.type"
+    @onCancel="onModalCancel()"
+    @onSubmit="onModalSubmit()"
+  />
   </tbody>
 </template>
 
@@ -22,20 +31,61 @@
   import { Component } from 'vue-property-decorator';
   import { timeFormatFilter } from '@/utils/filters/timeFormatFilter';
   import TimeSlot from '@/components/elements/TimeSlot.vue';
+  import Modal from '@/components/blocks/Modal.vue';
+  import { Reservation } from '@/types/Reservations';
+  import moment from 'moment';
 
   @Component({
-    components: { TimeSlot },
+    components: { Modal, TimeSlot },
     filters: {
       timeFormatFilter,
     },
   })
   export default class CalendarBody extends Vue {
+    public modal: { message: string | undefined, show: boolean, type: string } = {
+      message: '',
+      show: false,
+      type: 'normal',
+    };
+    private reservation: Reservation = {
+      day: null,
+      hour: 0,
+      minute: 0,
+    };
+
+    public onModalCancel() {
+      this.modal.show = false;
+    }
+
+    public onModalSubmit() {
+      this.$store.commit('addReservation', this.reservation);
+      this.modal.show = false;
+    }
+
     public get timePeriods(): number[][] {
       const loopLength = Array.from(Array(48).keys());
       const hours: number[] = loopLength.filter((loop) => (!(loop % 2)))
         .map((loop) => (loop / 2));
 
       return hours.map((hour) => [[hour, 0], [hour, 30]]).flat();
+    }
+
+    public onReservationClicked(reservation: Reservation) {
+      this.modal.message = reservation.message;
+      this.modal.type = 'normal';
+      const reservationISO = reservation.day.toISOString();
+      this.reservation = {
+        day: moment(reservationISO),
+        hour: reservation.hour,
+        minute: reservation.minute,
+      };
+      this.modal.show = true;
+    }
+
+    public onValidationError(message: string) {
+      this.modal.message = message;
+      this.modal.type = 'error';
+      this.modal.show = true;
     }
   }
 </script>
@@ -49,7 +99,7 @@
     }
 
     .timeLabel {
-      background-color: $purple-light;
+      background-color: $purple;
     }
   }
 </style>
