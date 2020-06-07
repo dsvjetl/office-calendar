@@ -124,6 +124,13 @@
       return reserved.length > 0;
     }
 
+    private get reservedThatDay(): boolean {
+      const reservationsThatDay = this.reservations.filter((reservation) => (
+        this.currentDay.isSame(reservation.day, 'day')
+      ));
+      return reservationsThatDay.length >= 1;
+    }
+
     private get isNotWorkingTime(): boolean {
       if (this.isTimePast) {
         return false;
@@ -151,6 +158,11 @@
     }
 
     public handleClick() {
+      if (this.reservedThatDay) {
+        this.$emit('onValidationError', 'You already have reservation on this day!');
+        return;
+      }
+
       const day = this.startingDay.day(this.dayProp);
       const message = `
         You want this reservation?

@@ -13,11 +13,13 @@
       :timePeriodProp="timePeriod"
       :dayProp="n"
       @onReservationClicked="onReservationClicked($event)"
+      @onValidationError="onValidationError($event)"
     />
   </tr>
   <Modal
     v-if="modal.show"
     :message="modal.message"
+    :type="modal.type"
     @onCancel="onModalCancel()"
     @onSubmit="onModalSubmit()"
   />
@@ -40,9 +42,10 @@
     },
   })
   export default class CalendarBody extends Vue {
-    public modal: { message: string | undefined, show: boolean } = {
+    public modal: { message: string | undefined, show: boolean, type: string } = {
       message: '',
       show: false,
+      type: 'normal',
     };
     private reservation: Reservations = {
       day: null,
@@ -69,12 +72,19 @@
 
     public onReservationClicked(reservation: Reservations) {
       this.modal.message = reservation.message;
+      this.modal.type = 'normal';
       const reservationISO = reservation.day.toISOString();
       this.reservation = {
         day: moment(reservationISO),
         hour: reservation.hour,
         minute: reservation.minute,
       };
+      this.modal.show = true;
+    }
+
+    public onValidationError(message: string) {
+      this.modal.message = message;
+      this.modal.type = 'error';
       this.modal.show = true;
     }
   }

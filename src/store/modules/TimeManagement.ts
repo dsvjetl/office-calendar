@@ -30,6 +30,16 @@ const mutations = {
       minute: number,
     },
   ) {
+    const reservations = state.reservations;
+
+    const reservedThatDay = reservations.filter((reservationInner) => (
+      reservationInner.day.isSame(reservation.day, 'day')
+    ));
+
+    if (reservedThatDay.length) {
+      return;
+    }
+
     state.reservations.push(reservation);
   },
 };

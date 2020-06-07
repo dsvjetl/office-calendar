@@ -9,10 +9,11 @@
           class="button"
           @click.native="onClick('cancel')"
         >
-          <span class="u2 buttonText">Cancel</span>
+          <span class="u2 buttonText">{{type === 'normal' ? 'Cancel' : 'Ok'}}</span>
         </Button>
         <Button
           class="button"
+          v-if="type === 'normal'"
           @click.native="onClick('submit')"
         >
           <span class="u2 buttonText">Ok</span>
@@ -32,6 +33,7 @@
   })
   export default class Modal extends Vue {
     @Prop({ required: true }) public message!: string;
+    @Prop({ required: false, default: 'normal' }) public type!: string;
 
     public onClick(type: string) {
       switch (type) {
