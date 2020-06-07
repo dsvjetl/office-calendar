@@ -2,7 +2,10 @@
   <td
     class="coTimeSlot"
     @click="handleClick"
-    :class="[{'isPast': isNotWorking}]"
+    :class="[
+      {'isPast': isNotWorking},
+      {'isBreak': (isEvenDayBreak || isOddDayBreak)}
+    ]"
   >
   </td>
 </template>
@@ -56,11 +59,13 @@
       alert(message);
     }
 
-    public get isNotWorking() {
+    public get isNotWorking(): boolean {
       return this.isTimePast
         || this.isNotWorkingTime
         || this.isEvenDayBreak
-        || this.isOddDayBreak;
+        || this.isOddDayBreak
+        || this.isSunday
+        || this.isNotWorkingSaturday;
     }
 
     private get startingDay(): any {
@@ -77,7 +82,7 @@
     }
 
     private get isDayEven(): boolean {
-      return this.currentDay.isoWeekday() % 2 === 0;
+      return this.currentDay.date() % 2 === 0;
     }
 
     private get isEvenDayBreak(): boolean {
@@ -86,8 +91,12 @@
       }
 
       const slotHour: number = this.timePeriodProp[0];
+      const slotMinute: number = this.timePeriodProp[1];
 
-      return slotHour === this.evenDay.breakStart.hour;
+      return slotHour === this.evenDay.breakStart.hour
+        && slotMinute !== 30
+        && !this.isSunday
+        && !this.isNotWorkingSaturday;
     }
 
     private get isOddDayBreak(): boolean {
@@ -96,8 +105,20 @@
       }
 
       const slotHour: number = this.timePeriodProp[0];
+      const slotMinute: number = this.timePeriodProp[1];
 
-      return slotHour === this.oddDay.breakStart.hour;
+      return slotHour === this.oddDay.breakStart.hour
+        && slotMinute !== 30
+        && !this.isSunday
+        && !this.isNotWorkingSaturday;
+    }
+
+    private get isSunday() {
+      return this.dayProp === 7;
+    }
+
+    private get isNotWorkingSaturday() {
+      return !this.isDayEven && this.dayProp === 6;
     }
 
     private get isNotWorkingTime(): boolean {
@@ -145,6 +166,11 @@
     &.isPast {
       pointer-events: none;
       background-color: lighten($primary-bg, 10);
+    }
+
+    &.isBreak {
+      pointer-events: none;
+      background-color: $break;
     }
   }
 </style>
