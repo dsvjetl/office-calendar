@@ -84,7 +84,7 @@
     }
 
     private get isEvenDayBreak(): boolean {
-      if (!this.isDayEven) {
+      if (!this.isDayEven || this.isTimePast) {
         return false;
       }
 
@@ -98,7 +98,7 @@
     }
 
     private get isOddDayBreak(): boolean {
-      if (this.isDayEven) {
+      if (this.isDayEven || this.isTimePast) {
         return false;
       }
 
