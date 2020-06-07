@@ -1,5 +1,8 @@
 # Office Calendar
 
+## Live Demo
+- [Live Demo](https://domagoj-office.netlify.app/)
+
 ## Requirements
 - Node (~v13.13.0)
 - NPM (~v6.14.4)
