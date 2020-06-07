@@ -1,4 +1,8 @@
-# office-calendar
+# Office Calendar
+
+## Requirements
+- Node (~v13.13.0)
+- NPM (~v6.14.4)
 
 ## Project setup
 ```
