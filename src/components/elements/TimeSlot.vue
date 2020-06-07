@@ -83,7 +83,7 @@
       return this.currentDay.date() % 2 === 0;
     }
 
-    private get isEvenDayBreak(): boolean {
+    public get isEvenDayBreak(): boolean {
       if (!this.isDayEven || this.isTimePast) {
         return false;
       }
@@ -97,7 +97,7 @@
         && !this.isNotWorkingSaturday;
     }
 
-    private get isOddDayBreak(): boolean {
+    public get isOddDayBreak(): boolean {
       if (this.isDayEven || this.isTimePast) {
         return false;
       }
@@ -119,7 +119,7 @@
       return !this.isDayEven && this.dayProp === 6;
     }
 
-    private get isReserved(): boolean {
+    public get isReserved(): boolean {
       const currentDay = this.currentDay;
       const reserved = this.reservations.filter((reservation) => (
         reservation.hour === this.timePeriodProp[0]
